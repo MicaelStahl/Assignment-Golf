@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Assignment_Golf
 {
@@ -17,20 +18,54 @@ namespace Assignment_Golf
         }
         static double DistanceCalculation()
         {
-                                      // <Summary> //
-                     // This method calculates the distance flown by the ball after
-                     // the player has input correct angle and velocity values
-            double swingAmount = 0;
+            // <Summary> //
+            // This method calculates the distance flown by the ball after
+            // the player has input correct angle and velocity values
+
+            bool stayAlive = true;
+
+            double distanceToHole = DistanceToHole();
             double angle = AllowAngleAmount();
             double velocity = AllowVelocityAmount();
-            double distanceToHole = DistanceToHole();
+            int swings = 0;
 
             double gravity = 9.8;
 
             double radianValue = (Math.PI / 180) * angle;
             double ballDistance = Math.Pow(velocity, 2) / gravity * Math.Sin(2 * radianValue);
-            swingAmount++;
+
+            double distanceBetween = distanceToHole - ballDistance;
+
+
+            while (stayAlive)
+            {
+
+            double radianLoopValue = (Math.PI / 180) * angle;
+            double ballLoopDistance = Math.Pow(velocity, 2) / gravity * Math.Sin(2 * radianValue);
+
+            double distanceLoopBetween = distanceToHole - ballDistance;
+                if (distanceLoopBetween < -500)
+                {
+                    Console.WriteLine("You shot too far. You lose the game.");
+                    Console.ReadKey();
+                    stayAlive = false;
+                }
+                else if (distanceLoopBetween == 0)
+                {
+                    swings++;
+                    Console.WriteLine("Congratulations! you won in " + swings + " swings!");
+                }
+                else
+                {
+                    return DistanceToHole();
+                }
+            }
+
             return Math.Round(ballDistance, 2);
+        }
+        static void SwingLoop()
+        {
+            List<int> swings = new List<int>();
         }
         static double DistanceToHole()
         {

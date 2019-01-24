@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Assignment_Golf
 {
@@ -12,60 +13,102 @@ namespace Assignment_Golf
 
             //ballDis = Math.Abs(ballDis);
 
-            double ballDis = DistanceCalculation();
-            Console.WriteLine(ballDis);
-            Console.ReadKey();
+            SwingLoop();
+
+            //double ballDis = SwingLoop();
+            //Console.WriteLine(ballDis);
+            //Console.ReadKey();
         }
-        static double DistanceCalculation()
+        //static double DistanceCalculation()
+        //{
+        ////     < Summary > //
+        ////     This method calculates the distance flown by the ball after
+        ////     the player has input correct angle and velocity values
+
+        //    double distanceToHole = DistanceToHole();
+        //    double angle = AllowAngleAmount();
+        //    double velocity = AllowVelocityAmount();
+
+        //    double gravity = 9.8;
+
+        //    double radianValue = (Math.PI / 180) * angle;
+        //    double ballDistance = Math.Pow(velocity, 2) / gravity * Math.Sin(2 * radianValue);
+
+        //    double distanceBetween = distanceToHole - ballDistance;
+
+
+        //    SwingLoop(distanceBetween);
+
+        //    return Math.Round(ballDistance, 2);
+        //}
+        static void SwingLoop()
         {
-            // <Summary> //
-            // This method calculates the distance flown by the ball after
-            // the player has input correct angle and velocity values
-
             bool stayAlive = true;
-
-            double distanceToHole = DistanceToHole();
-            double angle = AllowAngleAmount();
-            double velocity = AllowVelocityAmount();
-            int swings = 0;
-
+            double swings = 0;
             double gravity = 9.8;
+            double distanceBetween = 0;
+            double finalBallDistance = 0;
+            double distanceToHole = 0;
 
-            double radianValue = (Math.PI / 180) * angle;
-            double ballDistance = Math.Pow(velocity, 2) / gravity * Math.Sin(2 * radianValue);
+            List<double> eachSwingDistance = new List<double>();
 
-            double distanceBetween = distanceToHole - ballDistance;
-
+            distanceToHole = DistanceToHole();
 
             while (stayAlive)
             {
+                double angle = AllowAngleAmount();
+                double velocity = AllowVelocityAmount();
+                
 
-            double radianLoopValue = (Math.PI / 180) * angle;
-            double ballLoopDistance = Math.Pow(velocity, 2) / gravity * Math.Sin(2 * radianValue);
 
-            double distanceLoopBetween = distanceToHole - ballDistance;
-                if (distanceLoopBetween < -500)
+                double radianValue = (Math.PI / 180) * angle;
+                double ballDistance = Math.Pow(velocity, 2) / gravity * Math.Sin(2 * radianValue);
+
+                eachSwingDistance.Add(ballDistance); // Remember. make a foreach with list to show the "history" of the swings and distance on each swing
+
+                finalBallDistance = finalBallDistance + ballDistance;
+
+                distanceBetween = distanceToHole - finalBallDistance;
+
+                if (distanceBetween < -500)
                 {
-                    Console.WriteLine("You shot too far. You lose the game.");
+                    Console.Clear();
+
+                    swings = swings + 1;
+
+                    Console.WriteLine("You shot too far. You shot " + Math.Round(Math.Abs(distanceBetween),1) + " meters too far in " + swings + " swings.");
                     Console.ReadKey();
                     stayAlive = false;
                 }
-                else if (distanceLoopBetween == 0)
+                else if (distanceBetween <= 0.5)
                 {
-                    swings++;
+                    Console.Clear();
+
+                    swings = swings + 1;
                     Console.WriteLine("Congratulations! you won in " + swings + " swings!");
+
+                    for (int i = 0; i < eachSwingDistance.Count; i++)
+                    {
+                        Console.WriteLine($"Swing {i + 1} = {eachSwingDistance[i]}");
+                    }
+                    Console.Write("Press any key to continue, you champion!");
+                    Console.ReadKey();
+                    stayAlive = false;
                 }
                 else
                 {
-                    return DistanceToHole();
+
+                    swings = swings + 1;
+
+                    if (swings < 10)
+                    {
+                        Console.Write("You suck! Go play Minigolf instead!");
+                    }
+                    Console.Clear();
+                    Console.WriteLine("You have " + Math.Round(Math.Abs(distanceBetween), 1) + " meters to the hole. and you're on " + swings + " swings.");
+
                 }
             }
-
-            return Math.Round(ballDistance, 2);
-        }
-        static void SwingLoop()
-        {
-            List<int> swings = new List<int>();
         }
         static double DistanceToHole()
         {
@@ -94,7 +137,7 @@ namespace Assignment_Golf
             Console.Write("Please insert the angle you wish to shoot in: ");
             double angle = double.Parse(Console.ReadLine());
 
-            if (angle < 0 )
+            if (angle < -1 )
             {
                 Console.WriteLine("Can't shoot in negative angles!");
                 return AllowAngleAmount();

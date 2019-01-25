@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Assignment_Golf
 {
@@ -21,8 +20,6 @@ namespace Assignment_Golf
             // it gathers data from various methods to 
             // make the golfgame a possibility
 
-
-
             double swings = 0;
             double distanceBetween = 0;
             double distanceBetweenNegative = 0;
@@ -36,7 +33,6 @@ namespace Assignment_Golf
             distanceToHole = DistanceToHole();
 
             distanceBetween = distanceToHole;
-
 
             while (stayAlive)
             {
@@ -80,8 +76,6 @@ namespace Assignment_Golf
                     {
                         swings = swings + 1;
                         Console.WriteLine("You shot " + Math.Round(Math.Abs(distanceBetween), 1) + " meters to far with your " + swings + " swing.");
-                        //distanceBetween = Math.Abs(distanceBetween);
-                        //Console.WriteLine(distanceBetween);
                     }
                     else if (Math.Abs(distanceBetween) < 0.1)
                     {
@@ -123,68 +117,90 @@ namespace Assignment_Golf
                         }
                     }
                 }
-                catch
+                catch (ArgumentOutOfRangeException)
                 {
-
+                    DisplayMessage("How'd you manage this? This value is way too big!");
                 }
             }
         }
 
         static double DistanceToHole()
         {
+            bool stayAlive = true;
+            double lackOfCreativeNames = 0;
+
             Console.Clear();
 
-            Console.Write("Do you wish for the computer to set the distance to the hole? y/n ");
-            char choice = Console.ReadKey(true).KeyChar;
-            if (choice == 'y')
+            do
             {
-                Random random = new Random();
-                int randomNumber = random.Next(1000, 2000);
-                Console.Clear();
-                DisplayMessage("The distance to the hole was determined to be: " + randomNumber + " meters. Good luck!", ConsoleColor.Green);
-                double distanceToHole = Convert.ToDouble(randomNumber);
-
-                return distanceToHole;
-
-            }
-            else if (choice == 'n')
-            {
-                Console.Clear();
-
-                Console.Write("Please enter your wanted distance (in meters) to the hole! ");
-                double distanceToHole = double.Parse(Console.ReadLine());
-
-                if (distanceToHole < 0)
+                try
                 {
-                    DisplayMessage("What kind of backwards dimension are we living in?? Try again!", ConsoleColor.Red);
-                    return DistanceToHole();
-                }
-                else if (distanceToHole > 2000)
-                {
-                    DisplayMessage("That's some absolute distance! Too big, try again!", ConsoleColor.Red);
-                    return DistanceToHole();
-                }
-                else
-                {
-                    return distanceToHole;
-                }
-            }
-            else
-            {
 
-                DisplayMessage("\nPlease try again...", ConsoleColor.Red);
+                    Console.Write("Do you wish for the computer to set the distance to the hole? y/n ");
+                    char choice = Console.ReadKey(true).KeyChar;
+                    if (choice == 'y')
+                    {
+                        Random random = new Random();
+                        int randomNumber = random.Next(320, 2000);
+                        Console.Clear();
+                        DisplayMessage("The distance to the hole was determined to be: " + randomNumber + " meters. Good luck!", ConsoleColor.Green);
+                        double distanceToHole = Convert.ToDouble(randomNumber);
 
-                return DistanceToHole();
-            }
+                        return distanceToHole;
+
+                    }
+                    else if (choice == 'n')
+                    {
+                        Console.Clear();
+
+                        Console.Write("Please enter your wanted distance (in meters) to the hole! ");
+                        double distanceToHole = double.Parse(Console.ReadLine());
+
+                        if (distanceToHole < 0)
+                        {
+                            DisplayMessage("What kind of backwards dimension are we living in?? Try again!", ConsoleColor.Red);
+                        }
+                        else if (distanceToHole > 2000 || distanceToHole < 10000)
+                        {
+                            DisplayMessage("That's some absolute distance! Too big, try again!", ConsoleColor.Red);
+                        }
+                        else if (distanceToHole > 10000)
+                        {
+                            DisplayMessage("Are we trying to play golf, or fly to Jupiter?", ConsoleColor.Red);
+                        }
+                        else
+                        {
+                            return distanceToHole;
+                        }
+                    }
+                    else
+                    {
+                        DisplayMessage("\nPlease try again...", ConsoleColor.Red);
+                    }
+                }
+                catch (FormatException)
+                {
+                    DisplayMessage("Please actually type a correct value.", ConsoleColor.Red);
+                }
+                catch (OverflowException)
+                {
+                    DisplayMessage("Do try to pick a reasonable number next time. :) ", ConsoleColor.Red);
+                }
+                catch (Exception)
+                {
+                    DisplayMessage("Something went wrong. :(", ConsoleColor.Red);
+                }
+            } while (stayAlive);
+            return lackOfCreativeNames;
         }
 
         static double AllowAngleAmount()
         {
             bool stayAlive = true;
             int loopNumber = 0;
+
             do
             {
-
                 try
                 {
                     // <Summary> //
@@ -195,7 +211,7 @@ namespace Assignment_Golf
                     Console.Write("Please insert the angle you wish to shoot in: ");
                     double angle = double.Parse(Console.ReadLine());
 
-                    if (angle <= -1)
+                    if (angle <= 0)
                     {
 
                         DisplayMessage("We're playing golf. Not a digging simulator!", ConsoleColor.Red);
@@ -237,7 +253,7 @@ namespace Assignment_Golf
                 Console.WriteLine("You can't shoot in negative speeds, silly you!");
                 return AllowVelocityAmount();
             }
-            else if (velocity > 100)
+            else if (velocity > 100 || velocity < 500)
             {
                 Console.WriteLine("Did you use a rocket to shoot or something? Try again!");
                 return AllowVelocityAmount();
@@ -256,6 +272,8 @@ namespace Assignment_Golf
 
         static double CalculateBallDistance(double angle, double velocity)
         {
+            // This method creates the equation to calculate the current ballDistance by bringing with 
+            // it the angle and velocity from previous methods.
             double gravity = 9.8;
 
             double radianValue = (Math.PI / 180) * angle;
@@ -266,12 +284,12 @@ namespace Assignment_Golf
 
         static void DisplayMessage(string note, ConsoleColor color = ConsoleColor.White)
         {
+            // This simple method works a bit like a Console.WriteLine where I can also easily change the color if I were to want too.
             Console.ForegroundColor = color;
             Console.WriteLine("\n" + note + "\n");
             Console.ResetColor();
             Console.WriteLine("Press any key to continue. . .");
             Console.ReadKey();
-
         }
     }
 }

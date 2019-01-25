@@ -25,22 +25,27 @@ namespace Assignment_Golf
             double swings = 0;
             double gravity = 9.8;
             double distanceBetween = 0;
-            //double distanceBetweenNegative = 0;
-            double finalBallDistance = 0;
-            double eachSwingDistanceCount = 0;
-            double distanceToHole = 0;
+            double distanceBetweenNegative = 0;
+            //double finalBallDistance = 0;
+            double swingDistanceCount = 0;
+            double distanceToHole = -0;
 
-            List<double> eachSwingDistance = new List<double>();
+            List<double> swingDistance = new List<double>();
+            List<double> distanceRemaining = new List<double>();
 
             // This calls for a method that will either let the
             // user pick the distance to the hole, or it'll random it
             distanceToHole = DistanceToHole();
 
+            distanceBetween = distanceToHole;
+
+
             while (stayAlive)
             {
                 // This While loop makes the golfgame a reality, and it starts
                 // by fetching the values for the angle and velocity to create
-                // the correct ballDistance result.
+                // the correct ballDistance result which then also - with a simple
+                // equation - gives you the distance remaining after every shot.
 
                 double angle = AllowAngleAmount();
                 double velocity = AllowVelocityAmount();
@@ -49,29 +54,27 @@ namespace Assignment_Golf
                 double radianValue = (Math.PI / 180) * angle;
                 double ballDistance = Math.Pow(velocity, 2) / gravity * Math.Sin(2 * radianValue);
 
-                eachSwingDistance.Add(ballDistance); // Adds every new swing to the list.
-                eachSwingDistanceCount = eachSwingDistance.Count;
+                swingDistance.Add(ballDistance); // Adds every new swing to the list.
 
-                foreach (double distance in eachSwingDistance)
-                {
-                    finalBallDistance = finalBallDistance + distance;
+                swingDistanceCount = swingDistance.Count;
 
-                    distanceBetween = distanceToHole - finalBallDistance;
+                distanceBetween = ballDistance - distanceBetween; //This equation gives you the remaining distance to the hole after every hit.
 
-                }
+                distanceBetweenNegative = distanceBetween;
 
-                finalBallDistance = 0;
+                distanceBetween = Math.Abs(distanceBetween);
 
-                //distanceBetween = Math.Abs(distanceBetweenNegative);
+                distanceRemaining.Add(distanceBetween);
 
-                // Here we check for 3 things that will either let you win, lose or continue shooting.
-                // if = Checks if the user shot more than 500 meters too far - Results in loss
-                // else if = checks if the user has successfully gotten the ball in the cup - result in win
+                // Here we check for 4 things that will either let you win, lose or continue shooting.
+                // if = Checks if the user shot further away than he begun - Results in loss if he does.
+                // else if = checks if the user has overshot and tells the user about it.
+                // else if = checks if the user has successfully gotten the ball in the cup - result in win.
                 // else = makes the loop continue until the user has either succeeded with previous statements or shot too many times.
 
-                if (distanceBetween < -100)
+                if (distanceBetween > distanceToHole)
                 {
-                    Console.Clear();
+                    //Console.Clear();
                     Console.WriteLine(distanceBetween);
                     swings = swings + 1;
 
@@ -80,9 +83,10 @@ namespace Assignment_Golf
 
                     stayAlive = false;
                 }
-                else if (distanceBetween < -1 && distanceBetween > -100)
+                else if (distanceBetweenNegative < -1 && distanceBetweenNegative > -100)
                 {
-                    Console.WriteLine(distanceBetween);
+                    swings = swings + 1;
+                    Console.WriteLine("You shot " + Math.Round(Math.Abs(distanceBetween), 1) + " meters to far with your " + swings + " swing.");
                     //distanceBetween = Math.Abs(distanceBetween);
                     //Console.WriteLine(distanceBetween);
                 }
@@ -93,10 +97,10 @@ namespace Assignment_Golf
                     swings = swings + 1;
                     Console.WriteLine("Congratulations! you won in " + swings + " swings!");
 
-                    for (int i = 0; i < eachSwingDistance.Count; i++)
+                    for (int i = 0; i < swingDistance.Count; i++)
                     {
                         // This creates the value "Swing X = Y. where X = Swing number and Y = distance on that swing.
-                        Console.WriteLine($"Swing {i + 1} = {Math.Round(eachSwingDistance[i], 1)}");
+                        Console.WriteLine($"Swing {i + 1} = {Math.Round(swingDistance[i], 1)}");
                     }
                     Console.Write("Press any key to continue, you champion!");
                     Console.ReadKey();
@@ -109,9 +113,9 @@ namespace Assignment_Golf
 
                     if (swings >= 10)
                     {
-                        for (int i = 0; i < eachSwingDistance.Count; i++)
+                        for (int i = 0; i < swingDistance.Count; i++)
                         {
-                            Console.WriteLine($"Swing {i + 1} = {Math.Round(eachSwingDistance[i], 1)}");
+                            Console.WriteLine($"Swing {i + 1} = {Math.Round(swingDistance[i], 1)}");
                         }
 
                         Console.WriteLine("\nYou reached the max amount of attempts! You suck!");
@@ -121,7 +125,7 @@ namespace Assignment_Golf
                     }
                     else
                     {
-                        Console.Clear();
+                        //Console.Clear();
                         Console.WriteLine(distanceBetween);
 
                         Console.WriteLine("You have " + Math.Round(Math.Abs(distanceBetween), 1) + " meters to the hole. and you're on " + swings + " swings.");

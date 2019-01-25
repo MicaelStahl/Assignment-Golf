@@ -24,11 +24,9 @@ namespace Assignment_Golf
 
 
             double swings = 0;
-            double gravity = 9.8;
             double distanceBetween = 0;
             double distanceBetweenNegative = 0;
-            double swingDistanceCount = 0;
-            double distanceToHole = -0;
+            double distanceToHole = 0;
 
             List<double> swingDistance = new List<double>();
             List<double> distanceRemaining = new List<double>();
@@ -51,12 +49,9 @@ namespace Assignment_Golf
 
                     double angle = AllowAngleAmount();
                     double velocity = AllowVelocityAmount();
-
-                    double radianValue = (Math.PI / 180) * angle;
-                    double ballDistance = Math.Pow(velocity, 2) / gravity * Math.Sin(2 * radianValue);
+                    double ballDistance = CalculateBallDistance(angle, velocity);
 
                     swingDistance.Add(ballDistance); // Adds every new swing to the list.
-                    swingDistanceCount = swingDistance.Count;
 
                     distanceBetween = ballDistance - distanceBetween; //This equation gives you the remaining distance to the hole after every hit.
 
@@ -98,7 +93,7 @@ namespace Assignment_Golf
                         for (int i = 0; i < swingDistance.Count; i++)
                         {
                             // This creates the value "Swing X = Y. where X = Swing number and Y = distance on that swing.
-                            Console.WriteLine($"Swing {i + 1} = {Math.Round(swingDistance[i], 1)}");
+                            Console.WriteLine($"Swing {i + 1} = {Math.Round(swingDistance[i], 1)}", ConsoleColor.Yellow);
                         }
                         Console.Write("Press any key to continue, you champion!");
                         Console.ReadKey();
@@ -112,10 +107,10 @@ namespace Assignment_Golf
                         {
                             for (int i = 0; i < swingDistance.Count; i++)
                             {
-                                Console.WriteLine($"Swing {i + 1} = {Math.Round(swingDistance[i], 1)}");
+                                Console.WriteLine($"Swing {i + 1} = {Math.Round(swingDistance[i], 1)}", ConsoleColor.Yellow);
                             }
 
-                            Console.WriteLine("\nYou reached the max amount of attempts! You suck!");
+                            Console.WriteLine("\nYou reached the max amount of attempts! You suck!", ConsoleColor.Red);
                             Console.ReadKey();
 
                             stayAlive = false;
@@ -124,35 +119,35 @@ namespace Assignment_Golf
                         {
                             Console.Clear();
 
-                            Console.WriteLine("You have " + Math.Round(Math.Abs(distanceBetween), 1) + " meters to the hole. and you're on " + swings + " swings.");
+                            Console.WriteLine("You have " + Math.Round(Math.Abs(distanceBetween), 1) + " meters to the hole. and you're on " + swings + " swings.", ConsoleColor.Yellow);
                         }
                     }
                 }
-                catch 
+                catch
                 {
 
                 }
             }
         }
+
         static double DistanceToHole()
         {
             Console.Clear();
 
             Console.Write("Do you wish for the computer to set the distance to the hole? y/n ");
-            string choice = Console.ReadLine();
-            choice = choice.ToLower();
-            if (choice == "y")
+            char choice = Console.ReadKey(true).KeyChar;
+            if (choice == 'y')
             {
                 Random random = new Random();
                 int randomNumber = random.Next(1000, 2000);
                 Console.Clear();
-                Console.WriteLine("The distance to the hole was determined to be: " + randomNumber + " meters. Good luck!");
+                DisplayMessage("The distance to the hole was determined to be: " + randomNumber + " meters. Good luck!", ConsoleColor.Green);
                 double distanceToHole = Convert.ToDouble(randomNumber);
 
                 return distanceToHole;
 
             }
-            else if (choice == "n")
+            else if (choice == 'n')
             {
                 Console.Clear();
 
@@ -161,12 +156,12 @@ namespace Assignment_Golf
 
                 if (distanceToHole < 0)
                 {
-                    Console.WriteLine("What kind of backwards dimension are we living in?? Try again!");
+                    DisplayMessage("What kind of backwards dimension are we living in?? Try again!", ConsoleColor.Red);
                     return DistanceToHole();
                 }
                 else if (distanceToHole > 2000)
                 {
-                    Console.WriteLine("That's some absolute distance! Too big, try again!");
+                    DisplayMessage("That's some absolute distance! Too big, try again!", ConsoleColor.Red);
                     return DistanceToHole();
                 }
                 else
@@ -176,89 +171,62 @@ namespace Assignment_Golf
             }
             else
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write("Please try again...");
-                Console.ResetColor();
-                Console.ReadKey();
+
+                DisplayMessage("\nPlease try again...", ConsoleColor.Red);
+
                 return DistanceToHole();
             }
         }
+
         static double AllowAngleAmount()
         {
-            try
+            bool stayAlive = true;
+            int loopNumber = 0;
+            do
             {
-                // <Summary> //
-                // This Method asks for the angle and verifies the angle
-                // is between 0 and 89 degrees. if it isn't it'll repeat
-                // itself until the user gives out a valid amount
 
-                Console.Write("Please insert the angle you wish to shoot in: ");
-                double angle = double.Parse(Console.ReadLine());
-
-                if (angle <= -1)
+                try
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("We're playing golf. Not a digging simulator!");
-                    Console.ResetColor();
+                    // <Summary> //
+                    // This Method asks for the angle and verifies the angle
+                    // is between 0 and 89 degrees. if it isn't it'll repeat
+                    // itself until the user gives out a valid amount
 
-                    return AllowAngleAmount();
+                    Console.Write("Please insert the angle you wish to shoot in: ");
+                    double angle = double.Parse(Console.ReadLine());
+
+                    if (angle <= -1)
+                    {
+
+                        DisplayMessage("We're playing golf. Not a digging simulator!", ConsoleColor.Red);
+                    }
+                    else if (angle >= 90)
+                    {
+
+                        DisplayMessage("Can't shoot at an altitude this high", ConsoleColor.Red);
+                    }
+                    else
+                    {
+                        return angle;
+                    }
                 }
-                else if (angle >= 90)
+                catch (FormatException)
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Can't shoot at an altitude this high");
-                    Console.ResetColor();
-
-                    return AllowAngleAmount();
+                    DisplayMessage("Please actually type a correct value.", ConsoleColor.Red);
                 }
-                else
+                catch (OverflowException)
                 {
-                    return angle;
+                    DisplayMessage("Do try to pick a reasonable number next time. :) ", ConsoleColor.Red);
+                }
+                catch (Exception)
+                {
+                    DisplayMessage("Something went wrong. :(", ConsoleColor.Red);
                 }
             }
-            catch (FormatException)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Please actually type a correct value.");
-                Console.ResetColor();
-                return AllowAngleAmount();
-
-            }
-            catch (OverflowException)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Do try to pick a reasonable number next time. :)");
-                Console.ResetColor();
-                return AllowAngleAmount();
-            }
-            //finally
-            //{
-            //    Console.Write("Do you wish to try again? y/n ");
-            //    string choice = Console.ReadLine();
-            //    choice = choice.ToLower();
-
-            //    if (choice == "y")
-            //    {
-            //        AllowAngleAmount();
-            //    }
-            //    else if (choice == "n")
-            //    {
-            //        Console.Write("Shutting down in 3.. 2.. 1..");
-            //        Console.ReadKey();
-            //        bool stayAlive = false;
-
-            //        SwingLoop(stayAlive);
-            //    }
-            //    else
-            //    {
-            //        Console.Write("Getting real tired of you.");
-            //        Console.ReadKey();
-            //        bool stayAlive = false;
-
-            //        SwingLoop(stayAlive);
-            //    }
-            //}
+            while (stayAlive); // Personal reminder = Do-While loops makes the While not require curly brackets.
+            return loopNumber;
         }
+
         static double AllowVelocityAmount()
         {
             Console.Write("Please insert the velocity you want to shoot in (m/s): ");
@@ -285,9 +253,25 @@ namespace Assignment_Golf
             }
 
         }
-        //static bool Exceptions()
-        //{
 
-        //}
+        static double CalculateBallDistance(double angle, double velocity)
+        {
+            double gravity = 9.8;
+
+            double radianValue = (Math.PI / 180) * angle;
+            double ballDistance = Math.Pow(velocity, 2) / gravity * Math.Sin(2 * radianValue);
+
+            return ballDistance;
+        }
+
+        static void DisplayMessage(string note, ConsoleColor color = ConsoleColor.White)
+        {
+            Console.ForegroundColor = color;
+            Console.WriteLine("\n" + note + "\n");
+            Console.ResetColor();
+            Console.WriteLine("Press any key to continue. . .");
+            Console.ReadKey();
+
+        }
     }
 }
